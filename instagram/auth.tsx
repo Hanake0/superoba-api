@@ -18,7 +18,12 @@ export type InstagramLongLivedRequestData = {
 	grant_type: "ig_exchange_token",
 	client_secret: string,
 	access_token: string,
-}
+};
+
+export type InstagramLongLivedRefreshData = {
+	grant_type: "ig_refresh_token",
+	access_token: string,
+};
 
 let cachedToken: InstagramAccessToken;
 
@@ -35,10 +40,8 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 				error_message: 'Token not requested yet'
 			}, token: null };
 
-	// Caso o token possa ser recarregado
-	if (cachedToken.token && Date.now() > (cachedToken.token.created_at + (86400 * 1000))
-	|| cachedToken.usage_time === "ShortLived") {
-
+	// Caso o token precise ser convertido
+	if (cachedToken.token && cachedToken.usage_time === "ShortLived") {
 		try {
 			const data: InstagramLongLivedRequestData = {
 				grant_type: "ig_exchange_token",
@@ -66,6 +69,50 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 					created_at: Date.now()
 				}
 			};
+
+			// Caso ocorra algum erro
+		} catch (err) {
+			console.log("Ocorreu um erro: ", err);
+			cachedToken = {
+				error: {
+					friendly_message: 'Erro ao requisitar token',
+					error_message: err.message
+				},
+				token: null
+			};
+		}
+
+		// Caso o token possa ser recarregado
+	} else if (Date.now() > (cachedToken.token.created_at + (86400 * 1000))) {
+		try {
+			const data: InstagramLongLivedRefreshData = {
+				grant_type: "ig_refresh_token",
+				access_token: cachedToken.token.access_token,
+			};
+
+			// Faz a requisição de token
+			const responseData = await (await fetch('https://graph.instagram.com/refresh_access_token', {
+				method: "POST",
+				body: JSON.stringify(data),
+				headers: headers
+
+				// Converte a resposta para json
+			})).json();
+
+			// Caso tenha conseguido dar refresh com sucesso
+			if(responseData["access_token"]) {
+				// Atualiza as informações do token na memória
+				cachedToken = {
+					error: null,
+					usage_time: "LongLived",
+					token: {
+						access_token: responseData['access_token'],
+						token_type: responseData['token_type'],
+						expires_in: responseData['expires_in'] * 1000,
+						created_at: Date.now()
+					}
+				};
+			}
 
 			// Caso ocorra algum erro
 		} catch (err) {
