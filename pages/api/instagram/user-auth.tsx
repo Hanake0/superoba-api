@@ -13,7 +13,8 @@ export default async function handler (req: NextApiRequest, res: NextApiResponse
 	if(code === undefined || code === null) {
 		const appId = process.env.IG_APP_ID;
 		const redirectUri = process.env.IG_REDIRECT_URI;
-		const scope = "user_profile,user_media,instagram_graph_user_profile";
+		const scope = "user_profile,user_media," +
+			"instagram_graph_user_profile,instagram_graph_user_media";
 
 		return res.redirect(307, "https://api.instagram.com/oauth/authorize" +
 			`?client_id=${appId}` +

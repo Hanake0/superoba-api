@@ -30,7 +30,7 @@ export async function sendFreeMessage(messageData: SendPulseFreeMessageRequestDa
 		const headers = {
 			"Content-Type": "application/json",
 			"User-Agent": "SuperOba-Api-Client",
-			"Authorization": `Bearer ${authToken.token.access_token}`
+			"Authorization": `${authToken.token.type} ${authToken.token.access_token}`
 		}
 
 		// Faz a requisição do envio da mensagem
@@ -43,7 +43,9 @@ export async function sendFreeMessage(messageData: SendPulseFreeMessageRequestDa
 		})).json();
 
 		// Guarda as informações
-		fmData = { success: responseData['success'], data: responseData['data'] };
+		if (responseData["success"]) {
+			fmData = { success: responseData['success'], data: responseData['data'] };
+		} fmData = { success: false, data: responseData };
 
 		// Caso ocorra algum erro
 	} catch (err) {
