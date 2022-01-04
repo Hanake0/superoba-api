@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import InstagramAccessToken from "../mongodb/models/InstagramAccessToken";
+import {getConnection, MongoDBConnection} from "../mongodb/connection";
 
 const headers = {
 	"Content-Type": "application/json",
@@ -32,6 +33,10 @@ let cachedToken: InstagramAccessToken;
  */
 export async function getAccessToken(code: string = null): Promise<InstagramAccessToken> {
 	if(code) cachedToken = await getShortLivedToken(code);
+	else {
+		const dbConn: MongoDBConnection = await getConnection();
+		cachedToken = await dbConn.InstagramTokens.findOne<InstagramAccessToken>();
+	}
 
 	// Caso token ainda não exista
 	if (cachedToken === null || cachedToken === undefined)
