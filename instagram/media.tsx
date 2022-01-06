@@ -17,9 +17,18 @@ export type InstagramUserMedia = {
 	caption: string,
 	media_url: string,
 	permalink?: string,
+	children?: {
+		data: InstagramPostChildren[],
+	},
 	thumbnail_url?: string,
 	timestamp: Date,
 	username: string,
+}
+
+export type InstagramPostChildren = {
+	id: string,
+	media_url: string,
+	timestamp: string,
 }
 
 const headers = {
@@ -39,8 +48,9 @@ export async function getUserMedia(forceRefresh: boolean = false, userId: string
 		const igToken: InstagramAccessToken = await getAccessToken();
 
 		// Faz a requisição dos posts
-		const responseData = await (await fetch(`https://graph.instagram.com/${userId}}` +
+		const responseData = await (await fetch(`https://graph.instagram.com/${userId}` +
 			'?fields=id,media_type,caption,media_url,permalink,thumbnail_url,timestamp,username' +
+			',children{id,media_url,timestamp}' +
 			`&access_token=${igToken.token.access_token}`,{
 			method: "GET",
 			headers: headers
@@ -56,8 +66,8 @@ export async function getUserMedia(forceRefresh: boolean = false, userId: string
 		else {
 
 			// Converte as strings de data para Date
-			const data = responseData['data'] as Object[];
-			data.forEach( obj => obj['timestamp'] = new Date(obj['timestamp']) );
+			const data = responseData['data'] as InstagramUserMedia[];
+			data.forEach( post => post.timestamp = new Date(post.timestamp) );
 
 			cachedData = {
 				created_at: Date.now(),
