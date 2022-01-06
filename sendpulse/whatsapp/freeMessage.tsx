@@ -6,8 +6,8 @@ export type SendPulseFreeMessageRequestData = {
 	message: {
 		type: 'text' | 'image' | 'document',
 		text?: { body: string }
-		image?: { link: string, caption: string }
-		document?: { link: string, caption: string }
+		image?: { link: string, caption?: string }
+		document?: { link: string, caption?: string }
 	}
 }
 
