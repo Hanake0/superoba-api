@@ -21,11 +21,6 @@ export type InstagramLongLivedRequestData = {
 	access_token: string,
 };
 
-export type InstagramLongLivedRefreshData = {
-	grant_type: "ig_refresh_token",
-	access_token: string,
-};
-
 let cachedToken: InstagramAccessToken;
 
 /**
@@ -36,6 +31,8 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 	else {
 		const dbConn: MongoDBConnection = await getConnection();
 		cachedToken = await dbConn.InstagramTokens.findOne<InstagramAccessToken>();
+		cachedToken.token.expires_in = Number(cachedToken.token.expires_in);
+		cachedToken.token.created_at = Number(cachedToken.token.created_at);
 	}
 
 	// Caso token ainda não exista
@@ -86,19 +83,15 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 				token: null
 			};
 		}
+	}
 
-		// Caso o token possa ser recarregado
-	} else if (Date.now() > (cachedToken.token.created_at + (86400 * 1000))) {
+	// Caso o token possa ser recarregado
+	if (Date.now() > (cachedToken.token.created_at + (86400 * 1000))) {
 		try {
-			const data: InstagramLongLivedRefreshData = {
-				grant_type: "ig_refresh_token",
-				access_token: cachedToken.token.access_token,
-			};
-
 			// Faz a requisição de token
-			const responseData = await (await fetch('https://graph.instagram.com/refresh_access_token', {
-				method: "POST",
-				body: JSON.stringify(data),
+			const responseData = await (await fetch('https://graph.instagram.com/refresh_access_token' +
+				`?grant_type=ig_refresh_token&access_token=${cachedToken.token.access_token}`, {
+				method: "GET",
 				headers: headers
 
 				// Converte a resposta para json
@@ -108,6 +101,8 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 			if(responseData["access_token"]) {
 				// Atualiza as informações do token na memória
 				cachedToken = {
+					_id: cachedToken._id,
+					account_id: cachedToken.account_id,
 					error: null,
 					usage_time: "LongLived",
 					token: {
@@ -119,6 +114,9 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 				};
 			}
 
+			const dbConn: MongoDBConnection = await getConnection();
+			await dbConn.InstagramTokens.replaceOne({ _id: cachedToken._id }, cachedToken);
+
 			// Caso ocorra algum erro
 		} catch (err) {
 			console.log("Ocorreu um erro: ", err);
@@ -127,7 +125,7 @@ export async function getAccessToken(code: string = null): Promise<InstagramAcce
 					friendly_message: 'Erro ao requisitar token',
 					error_message: err.message
 				},
-				token: null
+				token: cachedToken.token,
 			};
 		}
 	}
