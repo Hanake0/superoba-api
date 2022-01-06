@@ -26,7 +26,6 @@ export const mesesConvert = {
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	if(checkAuth(req, res) == false) return;
-	res.status(200).json({sucesso: "Mensagens serão enviadas"})
 
 	const dr: discountsRequestData = req.body as discountsRequestData;
 	const igData: InstagramUserMediaData = await getUserMedia(dr.force_refresh);
@@ -46,7 +45,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 		const regexFim = /\so\sestoque/im;
 		const regexDatas = /((\d{1,2}\/\d{1,2})(,\s|\se\s)?)+/im;
 		*/
-
+		
 	} else if(dr.valid_days === "today") {
 		igData.data = igData.data.filter(post =>
 			(post.timestamp.getUTCMonth() === month)  // Mesmo mês
@@ -92,5 +91,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 	// Caso não tenha nenhuma postagem
 
-	//res.status(200).json({sucesso: "Mensagens enviadas com sucesso"});
+	res.status(200).json({sucesso: "Mensagens enviadas com sucesso"});
 }
