@@ -45,13 +45,13 @@ export async function getUserMedia(forceRefresh: boolean = false, userId: string
 
 	// Caso forceRefresh: true ou informações com mais de 20 segundos
 	if( !cachedData || forceRefresh || (Date.now() - cachedData.created_at > 20000) ) try {
-		const igToken: InstagramAccessToken = await getAccessToken();
+		//const igToken: InstagramAccessToken = await getAccessToken();
 
 		// Faz a requisição dos posts
 		const responseData = await (await fetch(`https://graph.instagram.com/${userId}` +
 			'?fields=id,media_type,caption,media_url,permalink,thumbnail_url,timestamp,username' +
 			',children{id,media_url,timestamp}' +
-			`&access_token=${igToken.token.access_token}`,{
+			`&access_token=${process.env.IG_PROFILE_TOKEN}`,{
 			method: "GET",
 			headers: headers
 
