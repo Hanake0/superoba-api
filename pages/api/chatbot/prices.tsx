@@ -10,7 +10,7 @@ export type PricesRequest = {
 
 	search: string,
 	order: '' | 'MV' | 'PD' | 'PU' | 'MR' | 'AZ' | 'ZA',
-	page: number,
+	page: string,
 	items_per_page: '' | '4' | '8' | '10' | '15',
 }
 
@@ -33,7 +33,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	pr.items_per_page = (!validItemsPerPage.includes(pr.items_per_page)) ? '10' : pr.items_per_page;
 	pr.order = (!validOrders.includes(pr.order)) ? 'PD' : pr.order;
 
-	const results = await buscarProdutos(pr.search, pr.page, pr.items_per_page, pr.order);
+	const results = await buscarProdutos(pr.search, Number(pr.page), pr.items_per_page, pr.order);
 
 	const friendlyMessage = StringUtils.createList(results.Produtos);
 	await sendFreeMessage({
@@ -44,8 +44,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const qtdRes = results.Avaliacoes[0].int_qtd_produto;
 	const totalPages = Math.ceil(qtdRes/Number(pr.items_per_page));
 
-	const needsNP = totalPages > pr.page;
-	const needsPP = pr.page > 1;
+	const needsNP = totalPages > Number(pr.page);
+	const needsPP = Number(pr.page) > 1;
 
 	res.status(200).json({
 		success: true,
