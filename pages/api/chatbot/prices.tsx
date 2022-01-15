@@ -31,7 +31,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const pr: PricesRequest = req.body as PricesRequest;
 
 	pr.items_per_page = (!validItemsPerPage.includes(pr.items_per_page)) ? '10' : pr.items_per_page;
-	pr.order = (!validOrders.includes(pr.order)) ? 'PD' : pr.order;
+	pr.order = (!validOrders.includes(pr.order)) ? 'MV' : pr.order;
 
 	const results = await buscarProdutos(pr.search, Number(pr.page), pr.items_per_page, pr.order);
 
