@@ -46,8 +46,8 @@ const validItemsPerPage = ['4', '8', '15'];
 export default async function buscarProdutos(busca: string, pagina: number = 1, nr_resultados: string = '4',
                                              ordem: string = "MV"): Promise<Produto[]> {
 
-	nr_resultados = (!validItemsPerPage.includes(nr_resultados)) ? '4' : nr_resultados;
-	ordem = (!validOrders.includes(ordem)) ? 'MV' : ordem;
+	nr_resultados = (!validItemsPerPage.includes(nr_resultados)) ? '10' : nr_resultados;
+	ordem = (!validOrders.includes(ordem)) ? 'PD' : ordem;
 
 	// Payload da request
 	const request: ApiBuscaRequest = {
