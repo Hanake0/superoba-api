@@ -56,7 +56,7 @@ export default class StringUtils {
 			for (const part of name) str += `| ${part} |\n`;
 
 			if(produto.bit_esgotado) str += `|          PRODUTO ESGOTADO          |\n`
-			else str += `|      Valor: R$ ${StringUtils.limitSize(String(produto.mny_vlr_produto_por), 20)}|\n`;
+			else str += `|         Valor: R$ ${StringUtils.limitSize(String(produto.mny_vlr_produto_por), 17)}|\n`;
 			str += '--------------------------------------\n';
 
 		// Caso a busca não tenha nenhum resultado

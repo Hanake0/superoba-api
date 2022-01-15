@@ -9,19 +9,20 @@ export type PricesRequest = {
 	force_refresh: boolean,
 
 	search: string,
-	order: "MV" | "PD" | "PU" | "MR" | "AZ" | "ZA",
+	order: '' | 'MV' | 'PD' | 'PU' | 'MR' | 'AZ' | 'ZA',
 	page: number,
-	items_per_page: number,
+	items_per_page: '' | '4' | '8' | '15',
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	if(checkAuth(req, res) == false) return;
 
 	const pr: PricesRequest = req.body as PricesRequest;
-	const results = await buscarProdutos(pr.search, pr.page, pr.items_per_page, pr.order);
+	const results = await buscarProdutos(pr.search, pr.page,
+		pr.items_per_page == '' ? '4' : pr.items_per_page,
+		pr.order == '' ? 'MV' : pr.order);
 
 	const friendlyMessage = StringUtils.createList(results);
-	console.log(friendlyMessage);
 	await sendFreeMessage({
 		contact_id: pr.contact_id,
 		message: { type: "text", text: { body: friendlyMessage} }

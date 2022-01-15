@@ -40,7 +40,7 @@ export type ApiBuscaRequest = {
 	q: string
 }
 
-export default async function buscarProdutos(busca: string, pagina: number = 1, resPagina: number = 5,
+export default async function buscarProdutos(busca: string, pagina: number = 1, nr_resultados: string = '4',
     ordem: "MV" | "PD" | "PU" | "MR" | "AZ" | "ZA" = "MV"): Promise<Produto[]> {
 
 	// Payload da request
@@ -48,7 +48,7 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 		descricao: busca,
 		q: busca,
 		pg: pagina,
-		num_reg_pag: resPagina,
+		num_reg_pag: Number(nr_resultados),
 		order: ordem,
 
 		// Desnecessário
