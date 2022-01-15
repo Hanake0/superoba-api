@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { getAuthToken, SendPulseToken } from "../../../sendpulse/auth";
-import checkAuth from "../../../auth/api-auth";
+import checkAuth from "../../../utils/api-auth";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<SendPulseToken>) {
 	if(checkAuth(req, res) == false) return;

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import checkAuth from "../../../auth/api-auth";
+import checkAuth from "../../../utils/api-auth";
 import {getUserMedia, InstagramUserMediaData} from "../../../instagram/media";
 import {sendFreeMessage} from "../../../sendpulse/whatsapp/freeMessage";
 
