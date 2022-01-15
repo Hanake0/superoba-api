@@ -14,13 +14,13 @@ export type PricesRequest = {
 	items_per_page: '' | '4' | '8' | '15',
 }
 
+
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	if(checkAuth(req, res) == false) return;
 
 	const pr: PricesRequest = req.body as PricesRequest;
-	const results = await buscarProdutos(pr.search, pr.page,
-		pr.items_per_page == '' ? '4' : pr.items_per_page,
-		pr.order == '' ? 'MV' : pr.order);
+	const results = await buscarProdutos(pr.search, pr.page, pr.items_per_page, pr.order);
 
 	const friendlyMessage = StringUtils.createList(results);
 	await sendFreeMessage({

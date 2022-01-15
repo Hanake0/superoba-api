@@ -40,8 +40,14 @@ export type ApiBuscaRequest = {
 	q: string
 }
 
+const validOrders = ['MV', 'PD', 'PU', 'MR', 'AZ', 'ZA'];
+const validItemsPerPage = ['4', '8', '15'];
+
 export default async function buscarProdutos(busca: string, pagina: number = 1, nr_resultados: string = '4',
-    ordem: "MV" | "PD" | "PU" | "MR" | "AZ" | "ZA" = "MV"): Promise<Produto[]> {
+                                             ordem: string = "MV"): Promise<Produto[]> {
+
+	nr_resultados = (!validItemsPerPage.includes(nr_resultados)) ? '4' : nr_resultados;
+	ordem = (!validOrders.includes(ordem)) ? 'MV' : ordem;
 
 	// Payload da request
 	const request: ApiBuscaRequest = {
@@ -49,6 +55,8 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 		q: busca,
 		pg: pagina,
 		num_reg_pag: Number(nr_resultados),
+
+		// @ts-ignore
 		order: ordem,
 
 		// Desnecessário
