@@ -13,13 +13,17 @@ export type Produto = {
 	str_img_path: string,
 	str_img_path_cdn: string,
 }
+export type Avaliacao = {
+	int_nota_review: number,
+	int_qtd_produto: number,
+}
 
 export type ApiBuscaResponse = {
 	Produtos: Produto[],
 	Banners: unknown,
 	Categorias: unknown,
 	Precos: unknown,
-	Avaliacoes: unknown,
+	Avaliacoes: Avaliacao[],
 	Promocoes: unknown,
 }
 export type ApiBuscaRequest = {
@@ -40,14 +44,8 @@ export type ApiBuscaRequest = {
 	q: string
 }
 
-const validOrders = ['MV', 'PD', 'PU', 'MR', 'AZ', 'ZA'];
-const validItemsPerPage = ['4', '8', '15'];
-
 export default async function buscarProdutos(busca: string, pagina: number = 1, nr_resultados: string = '4',
-                                             ordem: string = "MV"): Promise<Produto[]> {
-
-	nr_resultados = (!validItemsPerPage.includes(nr_resultados)) ? '10' : nr_resultados;
-	ordem = (!validOrders.includes(ordem)) ? 'PD' : ordem;
+                                             ordem: string = "MV"): Promise<ApiBuscaResponse> {
 
 	// Payload da request
 	const request: ApiBuscaRequest = {
@@ -77,7 +75,7 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 		}
 
 		// Faz a requisição dos dados
-		const responseData = await (await fetch("https://superoba.com.br/api/busca",{
+		return await (await fetch("https://superoba.com.br/api/busca",{
 			method: "POST",
 			body: JSON.stringify(request),
 			headers: headers
@@ -85,11 +83,13 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 			// Converte a resposta para json
 		})).json() as ApiBuscaResponse;
 
-		return responseData.Produtos;
-
 		// Caso ocorra algum erro
 	} catch (err) {
 		console.log("Ocorreu um erro: ", err);
-		return [];
+		return {
+			Produtos:   [], Banners:   [],
+			Categorias: [], Precos:    [],
+			Avaliacoes: [],	Promocoes: [],
+		};
 	}
 }

@@ -11,22 +11,44 @@ export type PricesRequest = {
 	search: string,
 	order: '' | 'MV' | 'PD' | 'PU' | 'MR' | 'AZ' | 'ZA',
 	page: number,
-	items_per_page: '' | '4' | '8' | '15',
+	items_per_page: '' | '4' | '8' | '10' | '15',
 }
 
+export type PricesResponse = {
+	success: boolean,
 
+	needs_next_page_button: 0 | 1,
+	needs_previous_page_button: 0 | 1,
+}
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+const validOrders = ['MV', 'PD', 'PU', 'MR', 'AZ', 'ZA'];
+const validItemsPerPage = ['4', '8', '10', '15'];
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse<PricesResponse>) {
 	if(checkAuth(req, res) == false) return;
 
 	const pr: PricesRequest = req.body as PricesRequest;
+
+	pr.items_per_page = (!validItemsPerPage.includes(pr.items_per_page)) ? '10' : pr.items_per_page;
+	pr.order = (!validOrders.includes(pr.order)) ? 'PD' : pr.order;
+
 	const results = await buscarProdutos(pr.search, pr.page, pr.items_per_page, pr.order);
 
-	const friendlyMessage = StringUtils.createList(results);
+	const friendlyMessage = StringUtils.createList(results.Produtos);
 	await sendFreeMessage({
 		contact_id: pr.contact_id,
 		message: { type: "text", text: { body: friendlyMessage} }
 	});
 
-	res.status(200).json({sucesso: "Mensagens enviadas com sucesso"});
+	const qtdRes = results.Avaliacoes[0].int_qtd_produto;
+
+	const needsNP = qtdRes > pr.page*Number(pr.items_per_page);
+	const needsPP = pr.page > 1;
+
+	res.status(200).json({
+		success: true,
+
+		needs_next_page_button: needsNP ? 1 : 0,
+		needs_previous_page_button: needsPP ? 1 : 0,
+	});
 }
