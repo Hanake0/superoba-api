@@ -38,7 +38,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
 	if(pr.current_item) {
 		const friendlyMessage = StringUtils
-			.createList(results.Produtos.filter((p, i) => i!== pr.current_item));
+			.createList(results.Produtos.filter((p, i) => i === pr.current_item));
 
 		await sendFreeMessage({
 			contact_id: pr.contact_id, message: { type: "image", image: {
