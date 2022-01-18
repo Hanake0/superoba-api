@@ -36,7 +36,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 
 	const results = await buscarProdutos(pr.search, Number(pr.page), pr.items_per_page, pr.order);
 
-	if(pr.current_item) {
+	if(pr.current_item !== null) {
 		const friendlyMessage = StringUtils
 			.createList(results.Produtos.filter((p, i) => i === pr.current_item));
 
