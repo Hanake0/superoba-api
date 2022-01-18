@@ -11,7 +11,7 @@ export type PricesRequest = {
 	search: string,
 	order: '' | 'MV' | 'PD' | 'PU' | 'MR' | 'AZ' | 'ZA',
 	page: string,
-	items_per_page: '' | '4' | '8' | '10' | '15',
+	items_per_page: '' | '1' | '4' | '8' | '10' | '15',
 }
 
 export type PricesResponse = {
@@ -23,7 +23,7 @@ export type PricesResponse = {
 }
 
 const validOrders = ['MV', 'PD', 'PU', 'MR', 'AZ', 'ZA'];
-const validItemsPerPage = ['4', '8', '10', '15'];
+const validItemsPerPage = ['1', '4', '8', '10', '15'];
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse<PricesResponse>) {
 	if(checkAuth(req, res) == false) return;
@@ -36,9 +36,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	const results = await buscarProdutos(pr.search, Number(pr.page), pr.items_per_page, pr.order);
 
 	const friendlyMessage = StringUtils.createList(results.Produtos);
-	await sendFreeMessage({
+	if(pr.items_per_page === '1' && results.Produtos.length !== 0)
+		await sendFreeMessage({
+			contact_id: pr.contact_id, message: { type: "image", image: {
+				link: results.Produtos[0].str_img_path_cdn,
+				caption: friendlyMessage,
+			}}
+	}); else await sendFreeMessage({
 		contact_id: pr.contact_id,
-		message: { type: "text", text: { body: friendlyMessage} }
+		message: { type: "text", text: { body: friendlyMessage } }
 	});
 
 	const qtdRes = results.Avaliacoes[0].int_qtd_produto;
