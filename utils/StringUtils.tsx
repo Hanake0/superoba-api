@@ -46,7 +46,7 @@ export default class StringUtils {
 	}
 	
 	static createList = function (produtos: Produto[]): string {
-		let str = '```\n';
+		let str = '```';
 
 		str += '--------------------------------------\n';
 		if(produtos.length > 0)	for (const produto of produtos) {
@@ -57,13 +57,15 @@ export default class StringUtils {
 
 			if(produto.bit_esgotado) str += `|          PRODUTO ESGOTADO          |\n`
 			else str += `|         Valor: R$ ${StringUtils.limitSize(String(produto.mny_vlr_produto_por), 17)}|\n`;
-			str += '--------------------------------------\n';
+			if (produtos.indexOf(produto) != (produtos.length-1))
+				str += '--------------------------------------\n';
+			else str += '--------------------------------------';
 
 		// Caso a busca não tenha nenhum resultado
 		} else {
 
 			str += '|           SEM RESULTADOS           |\n'
-			str += '--------------------------------------\n';
+			str += '--------------------------------------';
 		}
 
 		str += '```';
