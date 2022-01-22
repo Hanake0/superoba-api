@@ -1,5 +1,9 @@
 import fetch from "node-fetch";
 
+const headers = {
+	"Content-Type": "application/json",
+	"User-Agent": "SuperOba-Api-Client",
+};
 
 export type Produto = {
 	id_produto: number,
@@ -25,6 +29,8 @@ export type ApiBuscaResponse = {
 	Precos: unknown,
 	Avaliacoes: Avaliacao[],
 	Promocoes: unknown,
+
+	Created_at: number;
 }
 export type ApiBuscaRequest = {
 	descricao: string,
@@ -69,19 +75,18 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 	}
 
 	try {
-		const headers = {
-			"Content-Type": "application/json",
-			"User-Agent": "SuperOba-Api-Client",
-		}
 
 		// Faz a requisição dos dados
-		return await (await fetch("https://superoba.com.br/api/busca",{
+		const results = await (await fetch("https://superoba.com.br/api/busca",{
 			method: "POST",
 			body: JSON.stringify(request),
 			headers: headers
 
 			// Converte a resposta para json
 		})).json() as ApiBuscaResponse;
+
+		results.Created_at = Date.now();
+		return results;
 
 		// Caso ocorra algum erro
 	} catch (err) {
@@ -90,6 +95,7 @@ export default async function buscarProdutos(busca: string, pagina: number = 1, 
 			Produtos:   [], Banners:   [],
 			Categorias: [], Precos:    [],
 			Avaliacoes: [],	Promocoes: [],
+			Created_at: Date.UTC(1970, 0),
 		};
 	}
 }
