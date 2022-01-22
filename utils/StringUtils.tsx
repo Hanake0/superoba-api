@@ -71,4 +71,21 @@ export default class StringUtils {
 		str += '```';
  		return str;
 	}
+
+	static formatProduct = function (produto: Produto): string {
+		let str = '```';
+
+		str += '--------------------------------------\n';
+		const name: string[] = StringUtils.limitSize(produto.str_nom_produto);
+
+		str += `|              --Nome--              |\n`;
+		for (const part of name) str += `| ${part} |\n`;
+
+		if(produto.bit_esgotado) str += `|          PRODUTO ESGOTADO          |\n`
+		else str += `|         Valor: R$ ${StringUtils.limitSize(String(produto.mny_vlr_produto_por), 17)}|\n`;
+		str += '--------------------------------------';
+
+		str += '```';
+		return str;
+	}
 }

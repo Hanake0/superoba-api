@@ -64,7 +64,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse<
 	if(images) for (let i = 1; i <= 5; i++)
 		if (results.Produtos[i-1]) products[`p${i}`] = {
 			image: results.Produtos[i-1].str_img_path_cdn,
-			caption: results.Produtos[i-1].str_nom_produto };
+			caption: StringUtils.formatProduct(results.Produtos[i-1]) };
 		else products[`p${i}`] = { image: '', caption: ''};
 
 	// x produtos em lista de texto
